@@ -10,8 +10,11 @@ private:
     std::vector<Task> m_tasks;
 
 public:
-    void addTask(const Task& task);
+    void addTask(Task task);
     std::vector<Task*> giveAllTasks();
     void saveTasks();
     void loadTasks();
+
+    bool isUniqueID(int id);
+    void generateTaskIDs(Task& task);
 };

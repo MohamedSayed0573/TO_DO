@@ -1,15 +1,12 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug with GDB",
+            "name": "Debug - Help",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/${input:executableName}",
-            "args": [],
+            "program": "${workspaceFolder}/todo",
+            "args": ["--help"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
@@ -22,16 +19,92 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "make debug", // Reverted to "make debug"
+            "preLaunchTask": "Build Todo App",
             "miDebuggerPath": "/usr/bin/gdb"
-        }
-    ],
-    "inputs": [
+        },
         {
-            "id": "executableName",
-            "type": "promptString",
-            "description": "Enter the name of the executable file (e.g., todo)",
-            "default": "todo"
+            "name": "Debug - Show Tasks",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/todo",
+            "args": ["show"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build Todo App",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "Debug - Add Task (Name Only)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/todo",
+            "args": ["add", "Debug Task"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build Todo App",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "Debug - Add Task (With Status)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/todo",
+            "args": ["add", "Debug Task with Status", "1"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build Todo App",
+            "miDebuggerPath": "/usr/bin/gdb"
+        },
+        {
+            "name": "Debug - Version",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/todo",
+            "args": ["--version"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build Todo App",
+            "miDebuggerPath": "/usr/bin/gdb"
         }
     ]
 }

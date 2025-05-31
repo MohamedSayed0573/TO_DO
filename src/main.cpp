@@ -39,29 +39,49 @@ int main(int argc, char* argv[])
 
     if (command == "add")
     {
-        const std::string& taskName = (std::string)argv[2];
-        int taskStatus;
+        if (argc != 3 && argc != 4) {
+            std::cerr << "Invalid format. Use --help for info\n";
+            return 1;
+        }
 
-        if (argc > 3)
+        if (argc == 3)
+        {
+            const std::string& taskName = (std::string)argv[2];
+            TO_DO.addTask(Task(taskName));
+        }
+        else if (argc == 4)
+        {
+            const std::string& taskName = (std::string)argv[2];
+            int taskStatus;
             taskStatus = std::stoi(argv[3]);
-
-        TO_DO.addTask(Task(taskName, taskStatus));
+            TO_DO.addTask(Task(taskName, taskStatus));
+        }        
         TO_DO.saveTasks();
 
         return 0;
     }
     else if (command == "show")
     {
+        if (argc != 2) {
+            std::cerr << "Invalid format. Use --help for info\n";
+            return 1;
+        }
+
         std::vector<Task*> Tasks = TO_DO.giveAllTasks();
         for (auto& task : Tasks)
         {
-            std::cout << "Task: " << task->getName() << ", [" << statusToStr(task->getStatus()) << "]\n";
+            std::cout << "Task: " << task->getName() << ", [" << statusToStr(task->getStatus())  << "]\n";
         }
 
         return 0;
     }
     else if (command == "--help" || command == "-h")
     {
+        if (argc != 2) {
+            std::cerr << "Invalid format. Use --help for info\n";
+            return 1;
+        }
+
         std::cout << "Usage: " << argv[0] << " <command> [arguments]\n";
         std::cout << "Commands:\n";
         std::cout << "  add <task_name> <status>  - Add a new task (0 -> To-Do | 1 -> In Progress | 2 -> Completed)\n";
@@ -72,6 +92,11 @@ int main(int argc, char* argv[])
     }
     else if (command == "--version" || command == "-v")
     {
+        if (argc != 2) {
+            std::cerr << "Invalid format. Use --help for info\n";
+            return 1;
+        }
+
         std::cout << VERSION << "\n";
         return 0;
     }
