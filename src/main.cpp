@@ -9,6 +9,7 @@
 int main(int argc, char* argv[])
 {
     Tasks TO_DO;
+    TO_DO.loadTasks();
 
     if (argc < 2)
     {
@@ -26,6 +27,9 @@ int main(int argc, char* argv[])
             taskStatus = std::stoi(argv[3]);
 
         TO_DO.addTask(Task(taskName, taskStatus));
+        TO_DO.saveTasks();
+
+        return 0;
     }
     else if (command == "show")
     {
@@ -34,6 +38,8 @@ int main(int argc, char* argv[])
         {
             std::cout << "Task: " << task->getName() << ", " << task->getStatus() << "\n";
         }
+
+        return 0;
     }
     else if (command == "--help")
     {

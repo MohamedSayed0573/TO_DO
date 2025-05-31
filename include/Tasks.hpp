@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <fstream>
 
 class Task;
 
@@ -11,4 +12,6 @@ private:
 public:
     void addTask(const Task& task);
     std::vector<Task*> giveAllTasks();
+    void saveTasks();
+    void loadTasks();
 };
