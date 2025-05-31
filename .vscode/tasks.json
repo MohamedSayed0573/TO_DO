@@ -1,0 +1,88 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "make debug",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Builds the debug version using the Makefile."
+        },
+        {
+            "label": "make release",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "release"
+            ],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Builds the release version using the Makefile."
+        },
+        {
+            "label": "make run",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "run"
+            ],
+            "detail": "Builds and runs the debug version using the Makefile."
+        },
+        {
+            "label": "make clean",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "clean"
+            ],
+            "detail": "Removes build artifacts using the Makefile."
+        },
+        {
+            "label": "make install",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "install"
+            ],
+            "detail": "Installs the application using the Makefile (requires sudo)."
+        },
+        {
+            "label": "make uninstall",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "uninstall"
+            ],
+            "detail": "Removes the application from the system using the Makefile (requires sudo)."
+        },
+        {
+            "label": "make deploy",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "deploy"
+            ],
+            "detail": "Uninstalls, builds, and installs the application using the Makefile."
+        },
+        {
+            "label": "make remove",
+            "type": "shell",
+            "command": "make",
+            "args": [
+                "remove"
+            ],
+            "detail": "Cleans build artifacts and uninstalls the application using the Makefile."
+        }
+    ]
+}
