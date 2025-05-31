@@ -6,6 +6,24 @@
 #include <string>
 #include <string_view>
 
+constexpr double VERSION = 1.0;
+
+enum Status
+{
+    ToDo,
+    InProgress,
+    Completed
+};
+
+std::string_view statusToStr(int s) {
+    switch (s) {
+        case ToDo: return "To-Do";
+        case InProgress: return "In Progress";
+        case Completed: return "Completed";
+        default: return "Unknown";
+    }
+}
+
 int main(int argc, char* argv[])
 {
     Tasks TO_DO;
@@ -23,6 +41,7 @@ int main(int argc, char* argv[])
     {
         const std::string& taskName = (std::string)argv[2];
         int taskStatus;
+
         if (argc > 3)
             taskStatus = std::stoi(argv[3]);
 
@@ -36,18 +55,24 @@ int main(int argc, char* argv[])
         std::vector<Task*> Tasks = TO_DO.giveAllTasks();
         for (auto& task : Tasks)
         {
-            std::cout << "Task: " << task->getName() << ", " << task->getStatus() << "\n";
+            std::cout << "Task: " << task->getName() << ", [" << statusToStr(task->getStatus()) << "]\n";
         }
 
         return 0;
     }
-    else if (command == "--help")
+    else if (command == "--help" || command == "-h")
     {
         std::cout << "Usage: " << argv[0] << " <command> [arguments]\n";
         std::cout << "Commands:\n";
-        std::cout << "  add <task_name> <status>  - Add a new task\n";
+        std::cout << "  add <task_name> <status>  - Add a new task (0 -> To-Do | 1 -> In Progress | 2 -> Completed)\n";
         std::cout << "  show                      - Show all tasks\n";
-        std::cout << "  --help                      - Show help menu\n";
+        std::cout << "  --version (-v)            - Show current version\n";
+        std::cout << "  --help (-h)               - Show help menu\n";
+        return 0;
+    }
+    else if (command == "--version" || command == "-v")
+    {
+        std::cout << VERSION << "\n";
         return 0;
     }
     else

@@ -27,7 +27,7 @@ void Tasks::saveTasks()
 
     for (auto task : m_tasks)
     {
-        write << task.getName() << "\t" << task.getStatus() << std::endl;
+        write << task.getName() << "|" << task.getStatus() << std::endl; // Delimiter is '|'
     }
 }
 
@@ -38,11 +38,12 @@ void Tasks::loadTasks()
 
     int numTasks;
     read >> numTasks;
+    read.ignore();
 
     for (int i = 0; i < numTasks; i++)
     {
         std::string taskName;
-        read >> taskName;
+        std::getline(read, taskName, '|'); // Read until you see the delimiter '|'
 
         int taskStatus;
         read >> taskStatus;
