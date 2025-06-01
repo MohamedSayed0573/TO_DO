@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <fstream>
+#include <optional>
 
 class Task;
 
@@ -14,6 +15,8 @@ public:
     std::vector<Task*> giveAllTasks();
     void saveTasks();
     void loadTasks();
+
+    Task* findTaskbyID(int id);
 
     bool isUniqueID(int id);
     void generateTaskIDs(Task& task);

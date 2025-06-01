@@ -5,6 +5,7 @@
 #include <string>
 #include <cstdlib>
 #include <ctime>
+#include <optional>
 
 const std::string DATA_FILE_NAME = "data.txt";
 constexpr int MINIMUM_ID = 0;
@@ -70,6 +71,17 @@ void Tasks::loadTasks()
 
     read.close();
 }
+
+Task* Tasks::findTaskbyID(int id)
+{
+    for (Task& task : m_tasks) {
+        if (task.getID() == id) {
+            return &task;
+        }
+    }
+    return nullptr;
+}
+
 
 bool Tasks::isUniqueID(int id)
 {
