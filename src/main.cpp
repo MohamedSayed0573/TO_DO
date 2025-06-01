@@ -57,6 +57,18 @@ int handleIDInput(char* argID)
     return intID;
 }
 
+void checkargc(int argc, int num1, int num2 = -1)
+{
+    if (num2 == -1) { // Didn't get num2 argument
+        num2 = num1;
+    }
+
+    if (!(argc >= num1 && argc <= num2)) {
+        std::cerr << "Invalid format. Use --help for info\n";
+        exit(1);
+    }
+}
+
 int main(int argc, char* argv[])
 {
     Tasks TO_DO;
@@ -72,10 +84,7 @@ int main(int argc, char* argv[])
 
     if (command == "add")
     {
-        if (argc != 3 && argc != 4) {
-            std::cerr << "Invalid format. Use --help for info\n";
-            return 1;
-        }
+        checkargc(argc, 3, 4); // We expect 3 to 4 arguments
 
         // The user entered only a task name
         if (argc == 3)
@@ -96,10 +105,7 @@ int main(int argc, char* argv[])
     }
     else if (command == "show")
     {
-        if (argc != 2) {
-            std::cerr << "Invalid format. Use --help for info\n";
-            return 1;
-        }
+        checkargc(argc, 2); // We expect 2 arguments
 
         std::vector<Task*> Tasks = TO_DO.giveAllTasks();
         for (auto& task : Tasks)
@@ -111,11 +117,8 @@ int main(int argc, char* argv[])
     }
     else if (command == "update")
     {
-        if (argc != 4 && argc != 5) {
-            std::cerr << "Invalid format. Use --help for info\n";
-            return 1;
-        }
-        
+        checkargc(argc, 4, 5); // We expect 4 to 5 arguments
+
         // Find the task by ID
         int taskID = handleIDInput(argv[2]);
         Task* task = TO_DO.findTaskbyID(taskID);
@@ -154,10 +157,7 @@ int main(int argc, char* argv[])
     }
     else if (command == "--help" || command == "-h")
     {
-        if (argc != 2) {
-            std::cerr << "Invalid format. Use --help for info\n";
-            return 1;
-        }
+        checkargc(argc, 2); // We expect 2 arguments
 
         std::cout << "Usage: " << argv[0] << " <command> [arguments]\n";
         std::cout << "Commands:\n";
@@ -170,12 +170,9 @@ int main(int argc, char* argv[])
     }
     else if (command == "--version" || command == "-v")
     {
-        if (argc != 2) {
-            std::cerr << "Invalid format. Use --help for info\n";
-            return 1;
-        }
+        checkargc(argc, 2); // We expect 2 arguments
 
-        std::cout << VERSION << "\n";
+        std::cout << "Version: " << VERSION << "\n";
         return 0;
     }
     else
