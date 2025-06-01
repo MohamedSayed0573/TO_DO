@@ -13,7 +13,8 @@ public:
     const std::string& getName() const;
     int getStatus() const;
     int getID() const;
-    void setName(const std::string name);
+    
+    void setName(const std::string& name);
     void setStatus(int status);
     void setID(int id);
 };

@@ -8,6 +8,7 @@
 #include <optional>
 
 const std::string DATA_FILE_NAME = "data.txt";
+
 constexpr int MINIMUM_ID = 0;
 constexpr int MAXIMUM_ID = 999;
 
