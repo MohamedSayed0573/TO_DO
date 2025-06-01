@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 #include <string_view>
+#include <exception>
+#include <stdexcept>
 
 constexpr double VERSION = 1.1;
 
@@ -22,6 +24,37 @@ std::string_view statusToStr(int s) {
         case Completed: return "Completed";
         default: return "Unknown";
     }
+}
+
+int handleStatusInput(char* argStatus)
+{
+    int intStatus;
+
+    try {
+        intStatus = std::stoi(argStatus);
+        if (intStatus < 0 || intStatus > 2) {
+            throw std::out_of_range("Status must be 0, 1, or 2.");
+        }
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Invalid status: " << e.what() << "\n";
+        exit(1);
+    }
+    return intStatus;
+}
+
+int handleIDInput(char* argID)
+{
+    int intID;
+
+    try {
+        intID = std::stoi(argID);
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Invalid ID: " << e.what() << "\n";
+        exit(1);
+    }
+    return intID;
 }
 
 int main(int argc, char* argv[])
@@ -44,18 +77,19 @@ int main(int argc, char* argv[])
             return 1;
         }
 
+        // The user entered only a task name
         if (argc == 3)
         {
             const std::string& taskName = (std::string)argv[2];
             TO_DO.addTask(Task(taskName));
         }
+        // The user entered a task name and a status
         else if (argc == 4)
         {
             const std::string& taskName = (std::string)argv[2];
-            int taskStatus;
-            taskStatus = std::stoi(argv[3]);
+            int taskStatus = handleStatusInput(argv[3]);
             TO_DO.addTask(Task(taskName, taskStatus));
-        }        
+        }
         TO_DO.saveTasks();
 
         return 0;
@@ -81,9 +115,9 @@ int main(int argc, char* argv[])
             std::cerr << "Invalid format. Use --help for info\n";
             return 1;
         }
-
-        // Finding the task based on the ID
-        int taskID = std::stoi(argv[2]);
+        
+        // Find the task by ID
+        int taskID = handleIDInput(argv[2]);
         Task* task = TO_DO.findTaskbyID(taskID);
         if (!task) {
             std::cerr << "ID was not found." << std::endl;
@@ -94,7 +128,8 @@ int main(int argc, char* argv[])
         if (argc == 5)
         {
             std::string newName = std::string(argv[3]);
-            int newStatus = std::stoi(argv[4]);
+
+            int newStatus = handleStatusInput(argv[4]);
 
             task->setName(newName);
             task->setStatus(newStatus);
@@ -105,7 +140,7 @@ int main(int argc, char* argv[])
             std::string arg = std::string(argv[3]);
             if (arg == "0" || arg == "1" || arg == "2")  // If the input was a new status
             {
-                int newStatus = std::stoi(arg);
+                int newStatus = handleStatusInput(argv[3]);
                 task->setStatus(newStatus);
             }
             else // If the input was a new name
