@@ -1,5 +1,6 @@
 #include "Tasks.hpp"
 #include "Task.hpp"
+#include "json.hpp"
 
 #include <fstream>
 #include <string>
@@ -7,7 +8,7 @@
 #include <ctime>
 #include <optional>
 
-const std::string DATA_FILE_NAME = "data.txt";
+const std::string DATA_FILE_NAME = "data.json";
 
 constexpr int MINIMUM_ID = 0;
 constexpr int MAXIMUM_ID = 999;
@@ -33,13 +34,19 @@ void Tasks::saveTasks()
 {
     std::ofstream write;
     write.open(DATA_FILE_NAME);
-    write << m_tasks.size() << std::endl;
 
-    for (auto task : m_tasks)
-    {
-        write << task.getID() << "|" << task.getName() << "|" << task.getStatus() << std::endl; // Delimiter is '|'
+    nlohmann::json jTasks = nlohmann::json::array();
+    for (auto task : m_tasks) {
+        nlohmann::json jTask;
+        jTask = {
+            {"id", task.getID()},
+            {"name", task.getName()},
+            {"status", task.getStatus()}
+        };
+        jTasks.push_back(jTask);
     }
 
+    write << jTasks.dump(4); // Pretty print with 4 spaces indentation
     write.close();
 }
 
@@ -47,26 +54,19 @@ void Tasks::loadTasks()
 {
     std::ifstream read;
     read.open(DATA_FILE_NAME);
+    if (!read.is_open()) {
+        return;
+    }
 
-    int numTasks;
-    read >> numTasks;
-    read.ignore(); // Ignore the new line \n
+    nlohmann::json jTasks;
+    read >> jTasks;
 
-    for (int i = 0; i < numTasks; i++)
-    {
-        int taskID;
-        read >> taskID;
-
-        read.ignore(); // Ignore the first '|'
-
-        std::string taskName;
-        std::getline(read, taskName, '|'); // Read until you see the delimiter '|'
-
-        int taskStatus;
-        read >> taskStatus;
-
-        Task task(taskName, taskStatus);
-        task.setID(taskID);
+    for (const auto& jTask : jTasks) {
+        Task task(
+            jTask["name"].get<std::string>(),
+            jTask["status"].get<int>()
+        );
+        task.setID(jTask["id"].get<int>());
         m_tasks.push_back(task);
     }
 
