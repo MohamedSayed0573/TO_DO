@@ -12,7 +12,7 @@ private:
 
 public:
     void addTask(Task task);
-    std::vector<Task*> giveAllTasks();
+    std::vector<Task> giveAllTasks();
     void saveTasks();
     void loadTasks();
     void removeTask(const Task& task);

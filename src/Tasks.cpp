@@ -22,13 +22,13 @@ void Tasks::addTask(Task task)
     m_tasks.emplace_back(task);
 }
 
-std::vector<Task*> Tasks::giveAllTasks()
+std::vector<Task> Tasks::giveAllTasks()
 {
-    std::vector<Task*> TasksVec;
+    std::vector<Task> TasksVec;
 
     for (Task& task : m_tasks)
     {
-        TasksVec.push_back(&task);
+        TasksVec.push_back(task);
     }
     return TasksVec;
 }
@@ -82,10 +82,6 @@ Task* Tasks::findTaskbyID(int id)
         return task.getID() == id;
         });
         
-        if (it == m_tasks.end()) {
-            return nullptr;
-        }
-
     return &(*it);
 }
 

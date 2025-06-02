@@ -24,6 +24,7 @@ int handleIDInput(char* argID);
 void checkargc(int argc, int num1, int num2 = -1);
 void saveTasks(Tasks& TO_DO);
 void loadTasks(Tasks& TO_DO);
+std::vector<Task> filterTasksByStatus(std::vector<Task> allTasks, Status filterStatus);
 
 int main(int argc, char* argv[])
 {
@@ -40,17 +41,20 @@ int main(int argc, char* argv[])
     {
         checkargc(argc, 3, 4); // We expect 3 to 4 arguments
 
+        const std::string& taskName = argv[2];
+        if (taskName.empty() || taskName.length() > 100) {
+            std::cerr << "Invalid Input. Task name length should be from 1 to 100 characters" << "\n";
+            return 1;
+        }
         // The user entered only a task name
         // Status is 0 (To-Do) by default
         if (argc == 3)
         {
-            const std::string& taskName = argv[2];
             TO_DO.addTask(Task(taskName));
         }
         // The user entered a task name and a status
         else if (argc == 4)
         {
-            const std::string& taskName = argv[2];
             int taskStatus = handleStatusInput(argv[3]);
             TO_DO.addTask(Task(taskName, taskStatus));
         }
@@ -61,40 +65,37 @@ int main(int argc, char* argv[])
     else if (command == "show")
     {
         checkargc(argc, 2, 3); // We expect 2 arguments
+        
+        std::vector<Task> allTasks = TO_DO.giveAllTasks();
+
+        if (allTasks.empty()) {
+            std::cerr << "No Tasks were found" << "\n";
+            return 1;
+        }
 
         if (argc == 2) // No Filtering
         {
-            std::vector<Task*> allTasks = TO_DO.giveAllTasks();
             for (auto& task : allTasks)
             {
-                std::cout << "Task: " << task->getID() << ", " << task->getName() << ", [" << statusToStr(task->getStatus())  << "]\n";
+                std::cout << "Task: " << task.getID() << ", " << task.getName() << ", [" << statusToStr(task.getStatus())  << "]\n";
             }
         }
         else if (argc == 3) // Filtering
         {
             std::string_view filter = argv[2];
-            std::vector<Task*> allTasks = TO_DO.giveAllTasks();
+            Status statusFilter;
 
-            if (filter == "-t") {
-                for (auto& task : allTasks) {
-                    if (task->getStatus() == 0)
-                        std::cout << "Task: " << task->getID() << ", " << task->getName() << ", [" << statusToStr(task->getStatus()) << "]\n";
-                }
-            }
-            else if (filter == "-i") {
-                for (auto& task : allTasks) {
-                    if (task->getStatus() == 1)
-                        std::cout << "Task: " << task->getID() << ", " << task->getName() << ", [" << statusToStr(task->getStatus()) << "]\n";
-                }
-            }
-            else if (filter == "-c") {
-                for (auto& task : allTasks) {
-                    if (task->getStatus() == 2)
-                        std::cout << "Task: " << task->getID() << ", " << task->getName() << ", [" << statusToStr(task->getStatus()) << "]\n";
-                }
-            }
+            if (filter == "-t") { statusFilter = Status::ToDo; }
+            else if (filter == "-i") { statusFilter = Status::InProgress; }
+            else if (filter == "-c") { statusFilter = Status::Completed; }
             else {
-                std::cerr << "Invalid Format. Check --help for info" << "\n";
+                std::cerr << "Invalid Format. Check --help for info." << "\n";
+                return 1;
+            }
+
+            std::vector filteredTasks = filterTasksByStatus(allTasks, statusFilter);
+            for (auto& task : filteredTasks) {
+                std::cout << "Task: " << task.getID() << ", " << task.getName() << ", [" << statusToStr(task.getStatus()) << "]\n";
             }
         }
         return 0;
@@ -107,7 +108,7 @@ int main(int argc, char* argv[])
         int taskID = handleIDInput(argv[2]);
         Task* task = TO_DO.findTaskbyID(taskID);
         if (!task) {
-            std::cerr << "ID was not found." << std::endl;
+            std::cerr << "ID [" << taskID << "] was not found." << std::endl;
             return 1;
         }
 
@@ -146,7 +147,7 @@ int main(int argc, char* argv[])
 
         Task* task = TO_DO.findTaskbyID(taskID);
         if (!task) {
-            std::cerr << "Error: Task with ID " << taskID << " was not found" << "\n";
+            std::cerr << "No task with ID [" << taskID << "] was found" << "\n";
             return 1;
         }
 
@@ -269,4 +270,16 @@ void loadTasks(Tasks& TO_DO)
         std::cerr << "An Error occured while loading " << "\n" << ex.what() << "\n";
         exit(1);
     }
+}
+
+std::vector<Task> filterTasksByStatus(std::vector<Task> allTasks, Status filterStatus)
+{
+    std::vector<Task> vec;
+    for (auto& task : allTasks)
+    {
+        if (task.getStatus() == filterStatus) {
+            vec.push_back(task);
+        }
+    }
+    return std::vector<Task>();
 }
