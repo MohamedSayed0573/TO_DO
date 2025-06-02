@@ -15,6 +15,7 @@ public:
     std::vector<Task*> giveAllTasks();
     void saveTasks();
     void loadTasks();
+    void removeTask(const Task& task);
 
     Task* findTaskbyID(int id);
 

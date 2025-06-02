@@ -7,6 +7,9 @@
 #include <cstdlib>
 #include <ctime>
 #include <optional>
+#include <exception>
+#include <stdexcept>
+#include <algorithm>
 
 const std::string DATA_FILE_NAME = "data.json";
 
@@ -75,24 +78,37 @@ void Tasks::loadTasks()
 
 Task* Tasks::findTaskbyID(int id)
 {
-    for (Task& task : m_tasks) {
-        if (task.getID() == id) {
-            return &task;
+    auto it = std::find_if(m_tasks.begin(), m_tasks.end(), [id](const Task& task) {
+        return task.getID() == id;
+        });
+        
+        if (it == m_tasks.end()) {
+            return nullptr;
         }
-    }
-    return nullptr;
+
+    return &(*it);
 }
 
+void Tasks::removeTask(const Task& task)
+{
+    auto it = std::find_if(m_tasks.begin(), m_tasks.end(), [&task](const Task& t) {
+        return t == task;
+        });
+
+    if (it == m_tasks.end()) {
+        throw std::runtime_error("Cannot remove the task");
+    }
+
+    m_tasks.erase(it);
+}
 
 bool Tasks::isUniqueID(int id)
 {
-    for (const auto& task : m_tasks)
-    {
-        if (task.getID() == id) {
-            return false;
-        }
-    }
-    return true;
+    auto it = std::find_if(m_tasks.begin(), m_tasks.end(), [id](const Task& task) {
+        return task.getID() == id;
+        });
+
+    return (it == m_tasks.end());
 }
 
 void Tasks::generateTaskIDs(Task& task)

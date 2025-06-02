@@ -7,6 +7,7 @@
 #include <string_view>
 #include <exception>
 #include <stdexcept>
+#include <algorithm>
 
 constexpr double VERSION = 1.1;
 
@@ -54,17 +55,47 @@ int main(int argc, char* argv[])
             TO_DO.addTask(Task(taskName, taskStatus));
         }
         saveTasks(TO_DO);
+        std::cout << "The task was added successfully" << "\n";
         return 0;
     }
     else if (command == "show")
     {
-        checkargc(argc, 2); // We expect 2 arguments
+        checkargc(argc, 2, 3); // We expect 2 arguments
 
-
-        std::vector<Task*> allTasks = TO_DO.giveAllTasks();
-        for (auto& task : allTasks)
+        if (argc == 2) // No Filtering
         {
-            std::cout << "Task: " << task->getID() << ", " << task->getName() << ", [" << statusToStr(task->getStatus())  << "]\n";
+            std::vector<Task*> allTasks = TO_DO.giveAllTasks();
+            for (auto& task : allTasks)
+            {
+                std::cout << "Task: " << task->getID() << ", " << task->getName() << ", [" << statusToStr(task->getStatus())  << "]\n";
+            }
+        }
+        else if (argc == 3) // Filtering
+        {
+            std::string_view filter = argv[2];
+            std::vector<Task*> allTasks = TO_DO.giveAllTasks();
+
+            if (filter == "-t") {
+                for (auto& task : allTasks) {
+                    if (task->getStatus() == 0)
+                        std::cout << "Task: " << task->getID() << ", " << task->getName() << ", [" << statusToStr(task->getStatus()) << "]\n";
+                }
+            }
+            else if (filter == "-i") {
+                for (auto& task : allTasks) {
+                    if (task->getStatus() == 1)
+                        std::cout << "Task: " << task->getID() << ", " << task->getName() << ", [" << statusToStr(task->getStatus()) << "]\n";
+                }
+            }
+            else if (filter == "-c") {
+                for (auto& task : allTasks) {
+                    if (task->getStatus() == 2)
+                        std::cout << "Task: " << task->getID() << ", " << task->getName() << ", [" << statusToStr(task->getStatus()) << "]\n";
+                }
+            }
+            else {
+                std::cerr << "Invalid Format. Check --help for info" << "\n";
+            }
         }
         return 0;
     }
@@ -107,6 +138,34 @@ int main(int argc, char* argv[])
         saveTasks(TO_DO);
         return 0;
     }
+    else if (command == "remove")
+    {
+        checkargc(argc, 3);
+
+        int taskID = handleIDInput(argv[2]);
+
+        Task* task = TO_DO.findTaskbyID(taskID);
+        if (!task) {
+            std::cerr << "Error: Task with ID " << taskID << " was not found" << "\n";
+            return 1;
+        }
+
+        // Store task info for confirmation message before removal
+        int removedID = task->getID();
+        std::string removedName = task->getName();
+
+        try {
+            TO_DO.removeTask(*task);
+        }
+        catch (const std::exception& ex) {
+            std::cerr << "Error occurred while removing task: " << ex.what() << "\n";
+            return 1;
+        }
+
+        TO_DO.saveTasks();
+        std::cout << "Task [" << removedID << "] \"" << removedName << "\" was removed successfully" << "\n";
+        return 0;
+    }
     else if (command == "--help" || command == "-h")
     {
         checkargc(argc, 2); // We expect 2 arguments
@@ -114,8 +173,9 @@ int main(int argc, char* argv[])
         std::cout << "Usage: " << argv[0] << " <command> [arguments]\n";
         std::cout << "Commands:\n";
         std::cout << "  add <task_name> <status>             - Add a new task (0 -> To-Do | 1 -> In Progress | 2 -> Completed)\n";
-        std::cout << "  show                                 - Show all tasks\n";
+        std::cout << "  show <filter_flag>                   - Show all tasks (-t -> To-Do | -i -> In Progress | -c -> Completed)\n";
         std::cout << "  update <task_ID> <Name> <Status>     - Update a task\n";
+        std::cout << "  remove <task_ID>                     - Removes a task\n";
         std::cout << "  --version (-v)                       - Show current version\n";
         std::cout << "  --help (-h)                          - Show help menu\n";
         return 0;

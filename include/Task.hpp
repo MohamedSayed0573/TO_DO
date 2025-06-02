@@ -17,4 +17,6 @@ public:
     void setName(const std::string& name);
     void setStatus(int status);
     void setID(int id);
+
+    bool operator==(const Task& other) const;
 };

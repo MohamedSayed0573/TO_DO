@@ -18,3 +18,7 @@ void Task::setStatus(int status) { m_status = status; }
 
 void Task::setID(int id) { m_id = id; }
 
+bool Task::operator==(const Task& other) const
+{
+    return m_id == other.m_id;
+}
