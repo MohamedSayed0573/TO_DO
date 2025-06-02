@@ -16,16 +16,13 @@ const std::string DATA_FILE_NAME = "data.json";
 constexpr int MINIMUM_ID = 0;
 constexpr int MAXIMUM_ID = 999;
 
-void Tasks::addTask(Task task)
+void Tasks::addTask(Task& task)
 {
     generateTaskIDs(task);
     m_tasks.emplace_back(task);
 }
 
-std::vector<Task> Tasks::giveAllTasks()
-{
-    return m_tasks;
-}
+const std::vector<Task>& Tasks::giveAllTasks() { return m_tasks; }
 
 void Tasks::saveTasks()
 {
@@ -33,14 +30,12 @@ void Tasks::saveTasks()
     write.open(DATA_FILE_NAME);
 
     nlohmann::json jTasks = nlohmann::json::array();
-    for (auto task : m_tasks) {
-        nlohmann::json jTask;
-        jTask = {
+    for (const auto& task : m_tasks) {
+        jTasks.push_back({
             {"id", task.getID()},
             {"name", task.getName()},
             {"status", task.getStatus()}
-        };
-        jTasks.push_back(jTask);
+            });
     }
 
     write << jTasks.dump(4); // Pretty print with 4 spaces indentation
@@ -52,11 +47,13 @@ void Tasks::loadTasks()
     std::ifstream read;
     read.open(DATA_FILE_NAME);
     if (!read.is_open()) {
-        return;
+        throw std::runtime_error("File could not be opened.");
     }
 
     nlohmann::json jTasks;
     read >> jTasks;
+
+    m_tasks.reserve(jTasks.size());
 
     for (const auto& jTask : jTasks) {
         Task task(
@@ -93,9 +90,10 @@ void Tasks::removeTask(const Task& task)
     m_tasks.erase(it);
 }
 
-std::vector<Task> Tasks::searchTasks(const std::string& taskName)
+const std::vector<Task> Tasks::searchTasksByName(const std::string& taskName)
 {
     std::vector<Task> vec;
+
     std::copy_if(m_tasks.begin(), m_tasks.end(), std::back_inserter(vec), [&taskName](const Task& task) {
         return task.getName() == taskName;
         });

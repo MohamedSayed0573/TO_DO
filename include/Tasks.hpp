@@ -11,12 +11,12 @@ private:
     std::vector<Task> m_tasks;
 
 public:
-    void addTask(Task task);
-    std::vector<Task> giveAllTasks();
+    void addTask(Task& task);
+    const std::vector<Task>& giveAllTasks();
     void saveTasks();
     void loadTasks();
     void removeTask(const Task& task);
-    std::vector<Task> searchTasks(const std::string& taskName);
+    const std::vector<Task> searchTasksByName(const std::string& taskName);
 
     Task* findTaskbyID(int id);
 

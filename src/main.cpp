@@ -24,7 +24,7 @@ int handleIDInput(char* argID);
 void checkargc(int argc, int num1, int num2 = -1);
 void saveTasks(Tasks& TO_DO);
 void loadTasks(Tasks& TO_DO);
-std::vector<Task> filterTasksByStatus(std::vector<Task> allTasks, Status filterStatus);
+const std::vector<Task> filterTasksByStatus(const std::vector<Task>& allTasks, Status filterStatus);
 void printTask(const Task& task);
 void printTasks(const std::vector<Task>& task);
 
@@ -52,13 +52,15 @@ int main(int argc, char* argv[])
         // Status is 0 (To-Do) by default
         if (argc == 3)
         {
-            TO_DO.addTask(Task(taskName));
+            Task newTask(taskName);
+            TO_DO.addTask(newTask);
         }
         // The user entered a task name and a status
         else if (argc == 4)
         {
             int taskStatus = handleStatusInput(argv[3]);
-            TO_DO.addTask(Task(taskName, taskStatus));
+            Task newTask(taskName, taskStatus);
+            TO_DO.addTask(newTask);
         }
         saveTasks(TO_DO);
         std::cout << "The task was added successfully" << "\n";
@@ -68,7 +70,7 @@ int main(int argc, char* argv[])
     {
         checkargc(argc, 2, 3); // We expect 2 arguments
         
-        std::vector<Task> allTasks = TO_DO.giveAllTasks();
+        const std::vector<Task>& allTasks = TO_DO.giveAllTasks();
 
         if (allTasks.empty()) {
             std::cerr << "No Tasks were found" << "\n";
@@ -174,7 +176,7 @@ int main(int argc, char* argv[])
         checkargc(argc, 3);
 
         std::string taskName = argv[2];
-        std::vector<Task> vec = TO_DO.searchTasks(taskName);
+        std::vector<Task> vec = TO_DO.searchTasksByName(taskName);
         if (vec.empty()) {
             std::cout << "No tasks were found with the name \"" << taskName << "\".\n";
             return 1;
@@ -287,7 +289,7 @@ void loadTasks(Tasks& TO_DO)
     }
 }
 
-std::vector<Task> filterTasksByStatus(std::vector<Task> allTasks, Status filterStatus)
+const std::vector<Task> filterTasksByStatus(const std::vector<Task>& allTasks, Status filterStatus)
 {
     std::vector<Task> vec;
     std::copy_if(allTasks.begin(), allTasks.end(), std::back_inserter(vec), [&filterStatus](const Task& task) {
@@ -304,7 +306,7 @@ void printTask(const Task& task)
 
 void printTasks(const std::vector<Task>& tasksList)
 {
-    for (auto task : tasksList) {
+    for (const auto& task : tasksList) {
         std::cout << "Task: " << task.getID() << ", " << task.getName() << ", [" << statusToStr(task.getStatus())  << "]\n";
     }
 }
