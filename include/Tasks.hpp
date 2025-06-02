@@ -16,6 +16,7 @@ public:
     void saveTasks();
     void loadTasks();
     void removeTask(const Task& task);
+    std::vector<Task> searchTasks(const std::string& taskName);
 
     Task* findTaskbyID(int id);
 

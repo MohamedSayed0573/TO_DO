@@ -24,13 +24,7 @@ void Tasks::addTask(Task task)
 
 std::vector<Task> Tasks::giveAllTasks()
 {
-    std::vector<Task> TasksVec;
-
-    for (Task& task : m_tasks)
-    {
-        TasksVec.push_back(task);
-    }
-    return TasksVec;
+    return m_tasks;
 }
 
 void Tasks::saveTasks()
@@ -81,21 +75,32 @@ Task* Tasks::findTaskbyID(int id)
     auto it = std::find_if(m_tasks.begin(), m_tasks.end(), [id](const Task& task) {
         return task.getID() == id;
         });
-        
+
+    if (it == m_tasks.end()) {
+        return nullptr;
+    }
+
     return &(*it);
 }
 
 void Tasks::removeTask(const Task& task)
 {
-    auto it = std::find_if(m_tasks.begin(), m_tasks.end(), [&task](const Task& t) {
-        return t == task;
-        });
-
+    auto it = std::find(m_tasks.begin(), m_tasks.end(), task);
     if (it == m_tasks.end()) {
         throw std::runtime_error("Cannot remove the task");
     }
 
     m_tasks.erase(it);
+}
+
+std::vector<Task> Tasks::searchTasks(const std::string& taskName)
+{
+    std::vector<Task> vec;
+    std::copy_if(m_tasks.begin(), m_tasks.end(), std::back_inserter(vec), [&taskName](const Task& task) {
+        return task.getName() == taskName;
+        });
+
+    return vec;
 }
 
 bool Tasks::isUniqueID(int id)

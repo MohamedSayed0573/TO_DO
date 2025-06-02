@@ -25,6 +25,8 @@ void checkargc(int argc, int num1, int num2 = -1);
 void saveTasks(Tasks& TO_DO);
 void loadTasks(Tasks& TO_DO);
 std::vector<Task> filterTasksByStatus(std::vector<Task> allTasks, Status filterStatus);
+void printTask(const Task& task);
+void printTasks(const std::vector<Task>& task);
 
 int main(int argc, char* argv[])
 {
@@ -75,10 +77,7 @@ int main(int argc, char* argv[])
 
         if (argc == 2) // No Filtering
         {
-            for (auto& task : allTasks)
-            {
-                std::cout << "Task: " << task.getID() << ", " << task.getName() << ", [" << statusToStr(task.getStatus())  << "]\n";
-            }
+            printTasks(allTasks);
         }
         else if (argc == 3) // Filtering
         {
@@ -93,10 +92,13 @@ int main(int argc, char* argv[])
                 return 1;
             }
 
-            std::vector filteredTasks = filterTasksByStatus(allTasks, statusFilter);
-            for (auto& task : filteredTasks) {
-                std::cout << "Task: " << task.getID() << ", " << task.getName() << ", [" << statusToStr(task.getStatus()) << "]\n";
+            const std::vector<Task>& filteredTasks = filterTasksByStatus(allTasks, statusFilter);
+            if (filteredTasks.empty()) {
+                std::cout << "No [" << statusToStr(statusFilter) << "] Tasks were found..." << "\n";
+                return 1;
             }
+
+            printTasks(filteredTasks);
         }
         return 0;
     }
@@ -166,6 +168,19 @@ int main(int argc, char* argv[])
         TO_DO.saveTasks();
         std::cout << "Task [" << removedID << "] \"" << removedName << "\" was removed successfully" << "\n";
         return 0;
+    }
+    else if (command == "search")
+    {
+        checkargc(argc, 3);
+
+        std::string taskName = argv[2];
+        std::vector<Task> vec = TO_DO.searchTasks(taskName);
+        if (vec.empty()) {
+            std::cout << "No tasks were found with the name \"" << taskName << "\".\n";
+            return 1;
+        }
+
+        printTasks(vec);
     }
     else if (command == "--help" || command == "-h")
     {
@@ -275,11 +290,21 @@ void loadTasks(Tasks& TO_DO)
 std::vector<Task> filterTasksByStatus(std::vector<Task> allTasks, Status filterStatus)
 {
     std::vector<Task> vec;
-    for (auto& task : allTasks)
-    {
-        if (task.getStatus() == filterStatus) {
-            vec.push_back(task);
-        }
+    std::copy_if(allTasks.begin(), allTasks.end(), std::back_inserter(vec), [&filterStatus](const Task& task) {
+        return task.getStatus() == filterStatus;
+        });
+
+    return vec;
+}
+
+void printTask(const Task& task)
+{
+    std::cout << "Task: " << task.getID() << ", " << task.getName() << ", [" << statusToStr(task.getStatus())  << "]\n";
+}
+
+void printTasks(const std::vector<Task>& tasksList)
+{
+    for (auto task : tasksList) {
+        std::cout << "Task: " << task.getID() << ", " << task.getName() << ", [" << statusToStr(task.getStatus())  << "]\n";
     }
-    return std::vector<Task>();
 }
