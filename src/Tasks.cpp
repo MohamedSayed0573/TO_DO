@@ -5,7 +5,6 @@
 #include <fstream>
 #include <string>
 #include <cstdlib>
-#include <ctime>
 #include <optional>
 #include <exception>
 #include <stdexcept>
@@ -14,11 +13,14 @@
 const std::string DATA_FILE_NAME = "data.json";
 
 constexpr int MINIMUM_ID = 0;
-constexpr int MAXIMUM_ID = 999;
+constexpr int MAX_TASKS = 1000;
 
 void Tasks::addTask(Task& task)
 {
-    int id = generateTaskIDs(task);
+    int id = generateTaskIDs();
+    if (id == -1) {
+        throw std::out_of_range("You've exceeded the maximum number of tasks allowed");
+    }
     task.setID(id);
     m_tasks.emplace_back(task);
 }
@@ -114,19 +116,21 @@ bool Tasks::isUniqueID(int id) const
     return (it == m_tasks.end());
 }
 
-int Tasks::generateTaskIDs(Task& task) const
+int Tasks::generateTaskIDs() const
 {
-    static bool seeded = false;
-    if (!seeded) {
-        srand(time(0));
-        seeded = true;
+    if (m_tasks.size() == MAX_TASKS + 1) { // Having more than 1000 tasks is not allowed
+        return -1;
     }
-    
-    int id;
-    do {
-        id = rand() % (MAXIMUM_ID - MINIMUM_ID + 1) + MINIMUM_ID;
-    } while (!isUniqueID(id));
 
-    task.setID(id);
-    return id;
+    if (m_tasks.empty()) { // If the vector is empty, then this is the first task to be added
+        return MINIMUM_ID;
+    }
+
+    auto it = std::max_element(m_tasks.begin(), m_tasks.end(), [](const Task& largest, const Task& current) {
+        return largest.getID() < current.getID(); // I choose largest and current to make it more clear to myself
+        });
+    
+    int maxID = it->getID();
+    int newID = maxID + 1;
+    return newID;
 }

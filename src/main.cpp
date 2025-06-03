@@ -12,7 +12,7 @@
 #include <functional>
 #include <ranges>
 
-constexpr double VERSION = 1.1;
+constexpr double VERSION = 1.4;
 
 enum Status
 {
@@ -22,8 +22,8 @@ enum Status
 };
 
 std::string_view statusToStr(int s);
-int handleStatusInput(char* argStatus);
-int handleIDInput(char* argID);
+int handleStatusInput(const char* argStatus);
+int handleIDInput(const char* argID);
 void checkargc(int argc, int min, int max);
 void checkargc(int argc, int num);
 
@@ -187,17 +187,25 @@ void handleAddTask(Tasks& TO_DO, int argc, char* argv[])
     }
     // The user entered only a task name
     // Status is 0 (To-Do) by default
-    if (argc == 3)
-    {
+    if (argc == 3) {
         Task newTask(taskName);
-        TO_DO.addTask(newTask);
+        try {
+            TO_DO.addTask(newTask);
+        }
+        catch (const std::exception& ex) {
+            std::cerr << ex.what();
+        }
     }
     // The user entered a task name and a status
-    else if (argc == 4)
-    {
+    else if (argc == 4) {
         int taskStatus = handleStatusInput(argv[3]);
         Task newTask(taskName, taskStatus);
-        TO_DO.addTask(newTask);
+        try {
+            TO_DO.addTask(newTask);
+        }
+        catch (const std::exception& ex) {
+            std::cerr << ex.what();
+        }
     }
     saveTasks(TO_DO);
     std::cout << "The task was added successfully" << "\n";

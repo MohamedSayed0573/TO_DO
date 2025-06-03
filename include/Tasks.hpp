@@ -9,7 +9,6 @@ class Tasks
 {
 private:
     std::vector<Task> m_tasks;
-
 public:
     void addTask(Task& task);
     const std::vector<Task>& getAllTasks() const;
@@ -21,5 +20,5 @@ public:
     Task* findTaskbyID(int id);
 
     bool isUniqueID(int id) const;
-    int generateTaskIDs(Task& task) const;
+    int generateTaskIDs() const;
 };
