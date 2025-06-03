@@ -18,13 +18,14 @@ constexpr int MAXIMUM_ID = 999;
 
 void Tasks::addTask(Task& task)
 {
-    generateTaskIDs(task);
+    int id = generateTaskIDs(task);
+    task.setID(id);
     m_tasks.emplace_back(task);
 }
 
-const std::vector<Task>& Tasks::getAllTasks() { return m_tasks; }
+const std::vector<Task>& Tasks::getAllTasks() const { return m_tasks; }
 
-void Tasks::saveTasks()
+void Tasks::saveTasks() const
 {
     std::ofstream write;
     write.open(DATA_FILE_NAME);
@@ -42,7 +43,7 @@ void Tasks::saveTasks()
     write.close();
 }
 
-void Tasks::loadTasks()
+void Tasks::loadTasks() 
 {
     std::ifstream read;
     read.open(DATA_FILE_NAME);
@@ -91,20 +92,20 @@ void Tasks::removeTask(const Task& task)
     m_tasks.erase(it);
 }
 
-const std::vector<Task> Tasks::searchTasksByName(const std::string& taskName)
+std::vector<Task> Tasks::searchTasksByName(const std::string& taskName) const
 {
     std::vector<Task> vec;
     vec.reserve(m_tasks.size());
 
     std::copy_if(m_tasks.begin(), m_tasks.end(), std::back_inserter(vec), [&taskName](const Task& task) {
         return task.getName() == taskName;
-        });
+    });
 
     vec.shrink_to_fit();
     return vec;
 }
 
-bool Tasks::isUniqueID(int id)
+bool Tasks::isUniqueID(int id) const
 {
     auto it = std::find_if(m_tasks.begin(), m_tasks.end(), [id](const Task& task) {
         return task.getID() == id;
@@ -113,7 +114,7 @@ bool Tasks::isUniqueID(int id)
     return (it == m_tasks.end());
 }
 
-void Tasks::generateTaskIDs(Task& task)
+int Tasks::generateTaskIDs(Task& task) const
 {
     static bool seeded = false;
     if (!seeded) {
@@ -127,4 +128,5 @@ void Tasks::generateTaskIDs(Task& task)
     } while (!isUniqueID(id));
 
     task.setID(id);
+    return id;
 }

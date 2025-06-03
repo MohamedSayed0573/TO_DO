@@ -12,14 +12,14 @@ private:
 
 public:
     void addTask(Task& task);
-    const std::vector<Task>& getAllTasks();
-    void saveTasks();
+    const std::vector<Task>& getAllTasks() const;
+    void saveTasks() const;
     void loadTasks();
     void removeTask(const Task& task);
-    const std::vector<Task> searchTasksByName(const std::string& taskName);
+    std::vector<Task> searchTasksByName(const std::string& taskName) const;
 
     Task* findTaskbyID(int id);
 
-    bool isUniqueID(int id);
-    void generateTaskIDs(Task& task);
+    bool isUniqueID(int id) const;
+    int generateTaskIDs(Task& task) const;
 };

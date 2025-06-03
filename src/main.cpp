@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <functional>
+#include <ranges>
 
 constexpr double VERSION = 1.1;
 
@@ -28,7 +29,7 @@ void checkargc(int argc, int num);
 
 void saveTasks(Tasks& TO_DO);
 void loadTasks(Tasks& TO_DO);
-const std::vector<Task> filterTasksByStatus(const std::vector<Task>& allTasks, Status filterStatus);
+std::vector<Task> filterTasksByStatus(const std::vector<Task>& allTasks, Status filterStatus);
 void printTask(const Task& task);
 void printTasks(const std::vector<Task>& task);
 
@@ -62,8 +63,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    const std::string& command = argv[1];
-    if (commandsMap.count(command)) {
+if (const std::string& command = argv[1]; commandsMap.contains(command)) {
         commandsMap[command](TO_DO, argc, argv);
     }
     else {
@@ -83,7 +83,7 @@ std::string_view statusToStr(int s)
     }
 }
 
-int handleStatusInput(char* argStatus)
+int handleStatusInput(const char* argStatus)
 {
     int intStatus;
 
@@ -100,7 +100,7 @@ int handleStatusInput(char* argStatus)
     return intStatus;
 }
 
-int handleIDInput(char* argID)
+int handleIDInput(const char* argID)
 {
     int intID;
 
@@ -151,14 +151,14 @@ void loadTasks(Tasks& TO_DO)
     }
 }
 
-const std::vector<Task> filterTasksByStatus(const std::vector<Task>& allTasks, Status filterStatus)
+std::vector<Task> filterTasksByStatus(const std::vector<Task>& allTasks, Status filterStatus)
 {
     std::vector<Task> vec;
     vec.reserve(allTasks.size());
     std::copy_if(allTasks.begin(), allTasks.end(), std::back_inserter(vec), [&filterStatus](const Task& task) {
         return task.getStatus() == filterStatus;
         });
-
+    
     vec.shrink_to_fit();
     return vec;
 }
@@ -332,6 +332,7 @@ void handleHelpCommand(Tasks& TO_DO __attribute__((unused)), int argc, char* arg
     std::cout << "  show <filter_flag>                   - Show all tasks (-t -> To-Do | -i -> In Progress | -c -> Completed)\n";
     std::cout << "  update <task_ID> <Name> <Status>     - Update a task\n";
     std::cout << "  remove <task_ID>                     - Removes a task\n";
+    std::cout << "  search <task_name>                   - Search tasks by name\n";
     std::cout << "  --version (-v)                       - Show current version\n";
     std::cout << "  --help (-h)                          - Show help menu\n";
 }
