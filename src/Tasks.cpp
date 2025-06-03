@@ -22,7 +22,7 @@ void Tasks::addTask(Task& task)
     m_tasks.emplace_back(task);
 }
 
-const std::vector<Task>& Tasks::giveAllTasks() { return m_tasks; }
+const std::vector<Task>& Tasks::getAllTasks() { return m_tasks; }
 
 void Tasks::saveTasks()
 {
@@ -64,6 +64,7 @@ void Tasks::loadTasks()
         m_tasks.push_back(task);
     }
 
+    m_tasks.shrink_to_fit();
     read.close();
 }
 
@@ -93,11 +94,13 @@ void Tasks::removeTask(const Task& task)
 const std::vector<Task> Tasks::searchTasksByName(const std::string& taskName)
 {
     std::vector<Task> vec;
+    vec.reserve(m_tasks.size());
 
     std::copy_if(m_tasks.begin(), m_tasks.end(), std::back_inserter(vec), [&taskName](const Task& task) {
         return task.getName() == taskName;
         });
 
+    vec.shrink_to_fit();
     return vec;
 }
 
