@@ -26,7 +26,7 @@ void checkargc(int argc, int num);
 void handleSaveTasks(Tasks& TO_DO);
 void handleLoadTasks(Tasks& TO_DO);
 
-std::vector<Task> filterTasks(const std::vector<Task>& allTasks, int filterStatus, int filterPriority);
+std::vector<Task> filterTasks(const std::vector<Task>& allTasks, std::string_view filter);
 void printTask(const Task& task);
 void printTasks(const std::vector<Task>& task);
 
@@ -179,29 +179,42 @@ void handleLoadTasks(Tasks& TO_DO)
     }
 }
 
-std::vector<Task> filterTasks(const std::vector<Task>& allTasks, int filterStatus = -1, int filterPriority = -1)
+std::vector<Task> filterTasks(const std::vector<Task>& tasks, std::string_view filter)
 {
-    std::vector<Task> vec;
-    vec.reserve(allTasks.size());
+    std::vector<Task> filtered;
+    filtered.reserve(tasks.size());
 
-    if (filterPriority == -1) {
-        std::copy_if(allTasks.begin(), allTasks.end(), std::back_inserter(vec), [&filterStatus, &filterPriority](const Task& task) {
-            return (task.getStatus() == filterStatus);
-            });
+    if (filter == "-t") {
+        std::copy_if(tasks.begin(), tasks.end(), std::back_inserter(filtered),
+            [](const Task& task) { return task.getStatus() == Task::To_Do; });
     }
-    else if (filterStatus == -1) {
-        std::copy_if(allTasks.begin(), allTasks.end(), std::back_inserter(vec), [&filterStatus, &filterPriority](const Task& task) {
-            return (task.getPriority() == filterPriority);
-            });
+    else if (filter == "-i") {
+        std::copy_if(tasks.begin(), tasks.end(), std::back_inserter(filtered),
+            [](const Task& task) { return task.getStatus() == Task::In_Progress; });
     }
-    else if (filterStatus != -1 && filterPriority != -1) {
-        std::copy_if(allTasks.begin(), allTasks.end(), std::back_inserter(vec), [&filterStatus, &filterPriority](const Task& task) {
-            return (task.getStatus() == filterStatus && task.getPriority() == filterPriority);
-            });
+    else if (filter == "-c") {
+        std::copy_if(tasks.begin(), tasks.end(), std::back_inserter(filtered),
+            [](const Task& task) { return task.getStatus() == Task::Completed; });
+    }
+    else if (filter == "-l") {
+        std::copy_if(tasks.begin(), tasks.end(), std::back_inserter(filtered),
+            [](const Task& task) { return task.getPriority() == Task::Low; });
+    }
+    else if (filter == "-m") {
+        std::copy_if(tasks.begin(), tasks.end(), std::back_inserter(filtered),
+            [](const Task& task) { return task.getPriority() == Task::Medium; });
+    }
+    else if (filter == "-h") {
+        std::copy_if(tasks.begin(), tasks.end(), std::back_inserter(filtered),
+            [](const Task& task) { return task.getPriority() == Task::High; });
+    }
+    else {
+        std::cerr << "Invalid Format. Check --help for info." << "\n";
+        exit(1);
     }
 
-    vec.shrink_to_fit();
-    return vec;
+    filtered.shrink_to_fit();
+    return filtered;
 }
 
 void printTask(const Task& task)
@@ -289,23 +302,9 @@ void handleShowTasks(Tasks& TO_DO, int argc, char* argv[])
     else if (argc == 3) // Filtering
     {
         std::string_view filter = argv[2];
-        int statusFilter = -1;
-        int priorityFilter = -1;
-
-        if (filter == "-t") { statusFilter = Task::Status::To_Do; }
-        else if (filter == "-i") { statusFilter = Task::Status::In_Progress; }
-        else if (filter == "-c") { statusFilter = Task::Status::Completed; }
-        else if (filter == "-l") { priorityFilter = Task::Priority::Low; }
-        else if (filter == "-m") { priorityFilter = Task::Priority::Medium; }
-        else if (filter == "-h") { priorityFilter = Task::Priority::High; }
-        else {
-            std::cerr << "Invalid Format. Check --help for info." << "\n";
-            exit(1);
-        }
-
-        const std::vector<Task>& filteredTasks = filterTasks(allTasks, statusFilter, priorityFilter);
+        const std::vector<Task>& filteredTasks = filterTasks(allTasks, filter);
         if (filteredTasks.empty()) {
-            std::cout << "No [" << statusToStr(statusFilter) << "] Tasks were found..." << "\n";
+            std::cout << "No Tasks were found..." << "\n";
             exit(1);
         }
         printTasks(filteredTasks);
