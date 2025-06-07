@@ -10,7 +10,7 @@
 #include <stdexcept>
 #include <algorithm>
 
-const std::string DATA_FILE_NAME = "data.json";
+const std::string DATA_FILE_NAME = "data/data.json";
 
 constexpr int MINIMUM_ID = 0;
 constexpr int MAX_TASKS = 1000;
@@ -37,7 +37,8 @@ void Tasks::saveTasks() const
         jTasks.push_back({
             {"id", task.getID()},
             {"name", task.getName()},
-            {"status", task.getStatus()}
+            {"status", task.getStatus()},
+            {"priority", task.getPriority()}
             });
     }
 
@@ -50,19 +51,23 @@ void Tasks::loadTasks()
     std::ifstream read;
     read.open(DATA_FILE_NAME);
     if (!read.is_open()) {
-        throw std::runtime_error("File could not be opened.");
+        throw std::logic_error("File could not be opened.");
     }
 
     nlohmann::json jTasks;
     read >> jTasks;
+    if (jTasks.empty()) {
+        throw std::runtime_error("No tasks were found.");
+    }
 
     m_tasks.reserve(jTasks.size());
 
     for (const auto& jTask : jTasks) {
         Task task(
             jTask["name"].get<std::string>(),
-            jTask["status"].get<int>()
-        );
+            jTask["status"].get<Task::Status>(),
+            jTask["priority"].get<Task::Priority>()
+            );
         task.setID(jTask["id"].get<int>());
         m_tasks.push_back(task);
     }
@@ -118,7 +123,7 @@ bool Tasks::isUniqueID(int id) const
 
 int Tasks::generateTaskIDs() const
 {
-    if (m_tasks.size() == MAX_TASKS + 1) { // Having more than 1000 tasks is not allowed
+    if (m_tasks.size() == MAX_TASKS) { // Already reached maximum number of tasks allowed
         return -1;
     }
 
