@@ -235,7 +235,7 @@ void printTasks(const std::vector<Task>& tasksList)
 
 void handleAddTask(Tasks& TO_DO, int argc, char* argv[])
 {
-    checkargc(argc, 3, 5); // We expect 3 to 4 arguments
+    checkargc(argc, 3, 5); // We expect 3 to 5 arguments
 
     const std::string& taskName = argv[2];
     if (taskName.empty() || taskName.length() > 100) {
@@ -243,45 +243,26 @@ void handleAddTask(Tasks& TO_DO, int argc, char* argv[])
         exit(1);
     }
 
-    int taskID;
-    // The Default (Only task Name)
-    if (argc == 3) {
-        Task newTask(taskName);
-        try {
-            TO_DO.addTask(newTask);
-            taskID = newTask.getID();
-        }
-        catch (const std::exception& ex) {
-            std::cerr << ex.what();
-        }
+    Task::Status taskStatus = Task::Status::To_Do;
+    Task::Priority taskPriority = Task::Priority::Low;
+
+    if (argc == 4) {
+        taskStatus = handleInputStatus(argv[3]);
     }
-    // The user entered a task name and a status
-    else if (argc == 4) {
-        Task::Status taskStatus = handleInputStatus(argv[3]);
-        Task newTask(taskName, taskStatus);
-        try {
-            TO_DO.addTask(newTask);
-            taskID = newTask.getID();
-        }
-        catch (const std::exception& ex) {
-            std::cerr << ex.what();
-        }
-    }
-    // The user entered task name, status and priority
     else if (argc == 5) {
-        Task::Status taskStatus = handleInputStatus(argv[3]);
-        Task::Priority taskPriority = handleInputPriority(argv[4]);
-        Task newTask(taskName, taskStatus, taskPriority);
-        try {
-            TO_DO.addTask(newTask);
-            taskID = newTask.getID();
-        }
-        catch (const std::exception& ex) {
-            std::cerr << ex.what();
-        }
+        taskStatus = handleInputStatus(argv[3]);
+        taskPriority = handleInputPriority(argv[4]);
     }
-    handleSaveTasks(TO_DO);
-    std::cout << "Task " << taskID << " was added successfully" << "\n";
+
+    Task newTask(taskName, taskStatus, taskPriority);
+    try {
+        TO_DO.addTask(newTask);
+        handleSaveTasks(TO_DO);
+        std::cout << "Task " << newTask.getID() << " was added successfully" << "\n";
+    }
+    catch (const std::exception& ex) {
+        std::cerr << ex.what();
+    }
 }
 
 void handleShowTasks(Tasks& TO_DO, int argc, char* argv[])
